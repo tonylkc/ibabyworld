@@ -36,7 +36,7 @@ var app = angular.module('pwApp', ['ngAnimate', 'ngCookies', 'ngFacebook', 'ngSa
 
 
 
-	.run(function ($window,$http, $rootScope, $location, $cookies, $translate, matchmedia, Data, AuthService, Session) {
+	.run(function ($window, $rootScope, $location, $cookies, $translate, matchmedia, Data, AuthService, Session) {
 
 		$rootScope.loggingin = true
 
@@ -57,21 +57,6 @@ var app = angular.module('pwApp', ['ngAnimate', 'ngCookies', 'ngFacebook', 'ngSa
 			$rootScope.locale = locale;
 			$cookies['locale'] = $rootScope.locale;
 		}
-
-
-	    $rootScope.getUserDetails = function() {
-	        $http.get("http://localhost:3000/api/v1/sessions/profile").
-	        success(function(data) {
-	            if (data.token) {
-	                $rootScope.profile = data.member
-	                $rootScope.profile.childs = data.details[0].childs
-	                var addrstr = data.details[0].address
-	                var contactstr = data.details[0].contact
-	                $rootScope.profile.address = JSON.parse(addrstr)
-	                $rootScope.profile.contact = JSON.parse(contactstr)[0]
-	            }
-	        })
-	    }
 
 		// Switch to reloaded page
 		// if (goToPage != null) {
@@ -102,11 +87,9 @@ var app = angular.module('pwApp', ['ngAnimate', 'ngCookies', 'ngFacebook', 'ngSa
 			            $rootScope.loggingin = false
 			        });
 				},100)
-			} else {
-				console.log("Cannot Remember Password")
-				console.log(login)
-				$rootScope.loggingin = false
 			}
+
+
 		} else {
 			$rootScope.loggingin = false
 		}
@@ -123,10 +106,10 @@ var app = angular.module('pwApp', ['ngAnimate', 'ngCookies', 'ngFacebook', 'ngSa
         	AuthService.destroy().then(function (results) {
 				$rootScope.isAuthorized = AuthService.isAuthorized();
 				$rootScope.loggedUser == null;
+				$cookies['staysignedin'] === 'false'
 				delete ($cookies['email'])
 				delete ($cookies['password'])
-				delete ($cookies['staysignedin'])
-            	//$location.path('membership');
+            	$location.path('membership');
         	});
     	};
 
@@ -154,54 +137,54 @@ app.controller('HomeController', function($rootScope, $scope, $http, $state, $co
 		console.log("CANCEL")
 		$location.path('#/bb-shop/cancel')
 	}
-	
+<<<<<<< HEAD
 	$http.get('/api/v1/products').
   	success(function(data, status, headers, config) {
   		$scope.products = data
   		$scope.tags = data.tags
   	})
 	
+})
+
+=======
+
 	$http.get('/api/v1/get_article_by_tags/news').success(function(data){
 		$scope.news_article = data;
-		if($scope.news_article.length > 0) {
-			$http.get('/api/v1/' + requestPath.articles + '/' + $scope.news_article[0].id + '/medium-images').success(function(data){
-				$scope.news_article[0].image = data;
-				if (data.length <= 0){
-					$scope.news_article[0].image = [{image_url_medium: '/default.png'}];
-				}
-			});
-		}
+		$http.get('/api/v1/' + requestPath.articles + '/' + $scope.news_article[0].id + '/medium-images').success(function(data){
+			$scope.news_article[0].image = data;
+			if (data.length <= 0){
+				$scope.news_article[0].image = [{image_url_medium: '/default.png'}];
+			}
+		});
 	});
 
 	$http.get('/api/v1/get_article_by_tags/promotion').success(function(data){
 		$scope.promotion_article = data;
-		if ($scope.promotion_article.length > 0) {
-			$http.get('/api/v1/' + requestPath.articles + '/' + $scope.promotion_article[0].id + '/medium-images').success(function(data){
-				$scope.promotion_article[0].image = data;
-				if (data.length <= 0){
-					$scope.promotion_article[0].image = [{image_url_medium: '/default.png'}];
-				}
-			});
-		}
+		$http.get('/api/v1/' + requestPath.articles + '/' + $scope.promotion_article[0].id + '/medium-images').success(function(data){
+			$scope.promotion_article[0].image = data;
+			if (data.length <= 0){
+				$scope.promotion_article[0].image = [{image_url_medium: '/default.png'}];
+			}
+		});
 	});
 
 	$http.get('/api/v1/get_article_by_tags/hot-pick').success(function(data){
 		$scope.hot_article = data;
-		if ($scope.hot_article.length > 0) {
-			$http.get('/api/v1/' + requestPath.articles + '/' + $scope.hot_article[0].id + '/medium-images').success(function(data){
-				$scope.hot_article[0].image = data;
-				if (data.length <= 0){
-					$scope.hot_article[0].image = [{image_url_medium: '/default.png'}];
-				}
-			});
-		}
+		$http.get('/api/v1/' + requestPath.articles + '/' + $scope.hot_article[0].id + '/medium-images').success(function(data){
+			$scope.hot_article[0].image = data;
+			if (data.length <= 0){
+				$scope.hot_article[0].image = [{image_url_medium: '/default.png'}];
+			}
+		});
 	});
 
 	var i = 0;
 	$http.get('/api/v1/get_article_by_tags/mum-talks').success(function(data){
 		$scope.mum_talks_article = data;
+
 		$scope.mum_talks_article.forEach(function(m){
 			i++;
+
 			$http.get('/api/v1/' + requestPath.articles + '/' + m.id + '/medium-images').success(function(data){
 				m.image = data;
 				// console.log(m);
@@ -217,6 +200,7 @@ app.controller('HomeController', function($rootScope, $scope, $http, $state, $co
 
 	$http.get('/api/v1/get_product_by_tags/featured').success(function(data){
 		$scope.products = data;
+		console.log(data);
 		$scope.products.forEach(function(p){
 			$http.get('/api/v1/products/' + p.id + '/medium-images').success(function(data){
 				p.image = data;
@@ -226,5 +210,6 @@ app.controller('HomeController', function($rootScope, $scope, $http, $state, $co
 			});
 		});
 	});
-})
 
+})
+>>>>>>> 722ba619ab6c07824802e1286a902e143b3efe61

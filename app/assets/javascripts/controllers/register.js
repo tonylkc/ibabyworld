@@ -1,5 +1,60 @@
+app.filter('displayStatus', function() {
+  return function(input) {
+     status = "shopping cart"
+    if (!input) {
+        input = 0
+        return
+    }
+   
+    if (input == 1) {
+        status = "new"
+    } else if (input == 2) {
+        status = "signed in"
+    } else if (input == 3) {
+        status = "paypal issued"
+    } else if (input == 4) {
+        status = "paypal executed"
+    } else if (input == 5) {
+        status = "paypal cancelled"
+    } else if (input == 6) {
+        status = "paydollar issued"
+    } else if (input == 7) {
+        status = "paydollar executed"
+    } else if (input == 8) {
+        status = "paydollar cancelled"
+    } else if (input == 9) {
+        status = "test payment issued"
+    } else if (input == 10) {
+        status = "test payment executed"
+    } else if (input == 11) {
+        status = "test payment cancelled"
+    } else if (input == 255) {
+        status = "deleted"
+    }
+    return input + " (" + status + ")" ;
+  };
+});
+
 app.controller('RegisterController', function ($rootScope, $scope, $state, $location, $http, $timeout, $stateParams, Data, countries) {
     var nowYear = date.getFullYear();
+
+    $rootScope.getUserDetails()
+
+    $scope.getOrders = function() {
+        if ($rootScope.loggingin) {
+            setTimeout($scope.getOrders,100)
+            return
+        }
+        if ($rootScope.isAuthorized) {
+            $http.get('/api/v1/carts/myorders?memberid=' + $rootScope.loggedUser.id).
+            success(function(data, status, headers, config) {
+                $scope.orders = data.carts
+            })   
+        }
+    }
+
+    $scope.getOrders()
+
 
     $scope.token = $stateParams.token;   
     $scope.first_name = ''; 
@@ -37,21 +92,6 @@ app.controller('RegisterController', function ($rootScope, $scope, $state, $loca
         }, 3000);
     }
     
-    if ($state.current.name == "member.edit_profile") {
-        var loggedUser = $rootScope.loggedUser;
-
-        if (loggedUser) {
-            $scope.member = {
-                account_name: loggedUser.account_name == loggedUser.email ? "" : loggedUser.account_name,
-                email: loggedUser.email,
-                title: loggedUser.title,
-                first_name: loggedUser.first_name,
-                last_name: loggedUser.last_name,
-            }
-        }
-    }
-
-
     // Load all countries
     // countries.list(function(countries) {
     //     $scope.countries = countries;
@@ -128,4 +168,18 @@ app.controller('RegisterController', function ($rootScope, $scope, $state, $loca
             });
         }
     };
+    $scope.showOrder = function(o) {
+        $scope.currentorder = o
+        console.log(o)
+    }
+    $scope.hideOrder = function() {
+        delete ($scope.currentorder)
+    }
+    $scope.deleteOrder = function(o) {
+        $http.get('/api/v1/carts/deleteorder?cartid=' + o.id).
+        success(function(data, status, headers, config) {
+            $scope.getOrders()
+        })
+
+    }
 });

@@ -1,4 +1,4 @@
-app.controller('MembershipController', function ($scope, $rootScope, $state, $cookies, AuthService) {
+app.controller('MembershipController', function ($scope, $rootScope, $http, $state, $cookies, AuthService) {
 
     if ($cookies['staysignedin'] === 'true') {
         $rootScope.member = {
@@ -9,6 +9,9 @@ app.controller('MembershipController', function ($scope, $rootScope, $state, $co
             staysignedin : false
         }
     }
+
+    $rootScope.getUserDetails()
+
 
     $scope.doLogin = function (login) {
         AuthService.login(login).then(function (member) {
@@ -24,12 +27,13 @@ app.controller('MembershipController', function ($scope, $rootScope, $state, $co
                 }
                 $rootScope.isAuthorized = AuthService.isAuthorized();
                 $rootScope.loggedUser = member;
+                $rootScope.getUserDetails()
                 
-                if ($rootScope.$lastState.name) {
-                    $state.go($rootScope.$lastState.name);
-                } else {
-                    $state.go('home');
-                }
+                // if ($rootScope.$lastState.name) {
+                //     $state.go($rootScope.$lastState.name);
+                // } else {
+                //     $state.go('home');
+                // }
             }
             console.log('Check isAuthorized : '+ $rootScope.isAuthorized);
         });
